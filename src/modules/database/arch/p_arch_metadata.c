@@ -34,6 +34,10 @@ void p_dump_CPU_metadata(void *_p_arg) {
 
    p_dump_arm_metadata(_p_arg);
 
+#elif defined(CONFIG_RISCV)
+
+   p_dump_riscv_metadata(_p_arg);
+
 #endif
 
 }

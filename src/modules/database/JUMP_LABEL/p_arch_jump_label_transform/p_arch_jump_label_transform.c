@@ -188,7 +188,7 @@ static int p_arch_jump_label_transform_ret(struct kretprobe_instance *ri, struct
 static struct lkrg_probe p_arch_jump_label_transform_probe = {
   .type = LKRG_KRETPROBE,
   .krp = {
-#if defined(CONFIG_ARM64) && defined(HAVE_JUMP_LABEL_BATCH)
+#if (defined(CONFIG_ARM64) || defined(CONFIG_RISCV)) && defined(HAVE_JUMP_LABEL_BATCH)
     .kp.symbol_name = "arch_jump_label_transform_queue",
 #else
     .kp.symbol_name = "arch_jump_label_transform",

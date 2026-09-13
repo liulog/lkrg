@@ -38,6 +38,12 @@
  */
 #include "arm64/p_arm64_metadata.h"
 
+#elif defined(CONFIG_RISCV)
+/*
+ * RISC-V CPU specific data
+ */
+#include "riscv/p_riscv_metadata.h"
+
 #endif
 
 extern void p_dump_CPU_metadata(void *_p_arg);

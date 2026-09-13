@@ -99,7 +99,7 @@ GENERATE_CALL_FUNC(void, p_thaw_processes, void)
 #if !defined(CONFIG_ARM64)
  GENERATE_CALL_FUNC(void, p_flush_tlb_all, void)
 #endif
-#if defined(P_KERNEL_AGGRESSIVE_INLINING)
+#if defined(P_KERNEL_AGGRESSIVE_INLINING) || defined(CONFIG_RISCV)
  GENERATE_CALL_FUNC(int, p_set_memory_ro, unsigned long addr, int numpages)
  GENERATE_CALL_FUNC(int, p_set_memory_rw, unsigned long addr, int numpages)
  #if defined(CONFIG_ARM64)
@@ -616,7 +616,7 @@ static int __init p_lkrg_register(void) {
    P_SYM_INIT(flush_tlb_all)
 #endif
 
-#if defined(P_KERNEL_AGGRESSIVE_INLINING)
+#if defined(P_KERNEL_AGGRESSIVE_INLINING) || defined(CONFIG_RISCV)
    P_SYM_INIT(set_memory_ro)
    P_SYM_INIT(set_memory_rw)
 

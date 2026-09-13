@@ -13,7 +13,10 @@ LKRG 1.0.1 has been tested with Linux kernels from RHEL/CentOS 7's 3.10.0-1160
 and up to Fedora's build of 7.0.0-62.fc45.x86_64.
 
 LKRG currently supports the x86-64, 32-bit x86, AArch64 (ARM64), and 32-bit ARM
-CPU architectures.
+CPU architectures.  Experimental RISC-V support is also available; it covers
+the generic kernel and process integrity checks, RISC-V kprobe register access,
+syscall wrappers, jump labels, and basic per-CPU metadata.  It does not yet
+validate RISC-V-specific privileged CPU state.
 
 Please refer to CONCEPTS for concepts behind LKRG and for information on its
 efficacy, and to PERFORMANCE for information on its performance impact.

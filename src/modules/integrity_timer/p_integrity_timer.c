@@ -162,8 +162,8 @@ void p_check_integrity(struct work_struct *p_work) {
    /*
     * Checking all online CPUs critical data
     */
-   read_lock(&p_config_lock);
    p_read_cpu_lock();
+   read_lock(&p_config_lock);
 
    /* Find information about current CPUs in the system */
    p_get_cpus(&p_tmp_cpu_info);
@@ -223,8 +223,8 @@ void p_check_integrity(struct work_struct *p_work) {
    p_print_log(P_LOG_WATCH, "Hash of CPU metadata expected 0x%llx vs. actual 0x%llx",
       p_db.p_CPU_metadata_hashes, p_tmp_hash);
 
-   p_read_cpu_unlock();
    read_unlock(&p_config_lock);
+   p_read_cpu_unlock();
 
    /* Verify kprobes now */
    if (unlikely(lkrg_verify_kprobes())) {

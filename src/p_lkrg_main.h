@@ -135,7 +135,8 @@ static inline unsigned long get_random_long(void) {
  */
 //#define P_KERNEL_AGGRESSIVE_INLINING 1
 
-#if defined(CONFIG_X86_64) || defined(CONFIG_ARM64)
+#if defined(CONFIG_X86_64) || defined(CONFIG_ARM64) || \
+    (defined(CONFIG_RISCV) && defined(CONFIG_64BIT))
  #define P_LKRG_MARKER1 0x3369705f6d616441
  #define P_LKRG_MARKER2 0xdeadbabedeadbabe
 #else
@@ -197,7 +198,7 @@ typedef struct _p_lkrg_global_symbols_structure {
    void (*p_flush_tlb_all)(void);
 #endif
 
-#if defined(P_KERNEL_AGGRESSIVE_INLINING)
+#if defined(P_KERNEL_AGGRESSIVE_INLINING) || defined(CONFIG_RISCV)
    int (*p_set_memory_ro)(unsigned long addr, int numpages);
    int (*p_set_memory_rw)(unsigned long addr, int numpages);
  #if defined(CONFIG_ARM64)
@@ -391,7 +392,7 @@ GENERATE_CALL_FUNC_PROTO(void, p_thaw_processes, void)
 #if !defined(CONFIG_ARM64)
  GENERATE_CALL_FUNC_PROTO(void, p_flush_tlb_all, void)
 #endif
-#if defined(P_KERNEL_AGGRESSIVE_INLINING)
+#if defined(P_KERNEL_AGGRESSIVE_INLINING) || defined(CONFIG_RISCV)
  GENERATE_CALL_FUNC_PROTO(int, p_set_memory_ro, unsigned long addr, int numpages)
  GENERATE_CALL_FUNC_PROTO(int, p_set_memory_rw, unsigned long addr, int numpages)
  #if defined(CONFIG_ARM64)
