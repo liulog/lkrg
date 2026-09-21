@@ -46,6 +46,20 @@ static enum cpuhp_state p_hot_cpus;
 #endif
 unsigned int p_attr_init = 0;
 
+static atomic64_t p_iee_runs = ATOMIC64_INIT(0);
+static bool p_iee_registered;
+
+static unsigned long p_lkrg_iee_callback(enum iee_security_tool_id id,
+      enum iee_security_reason reason, unsigned long event, void *context)
+{
+   if (id != IEE_SECURITY_TOOL_LKRG ||
+       reason != IEE_SECURITY_REASON_CALLBACK)
+      return -EINVAL;
+
+   atomic64_inc(&p_iee_runs);
+   return 0;
+}
+
 DEFINE_MUTEX(p_ro_page_mutex);
 
 p_ro_page p_ro = {
@@ -646,13 +660,28 @@ static int __init p_lkrg_register(void) {
    p_register_notifiers();
    p_init_page_attr();
 
-   p_print_log(P_LOG_ALIVE, "LKRG initialized successfully");
+   p_ret = iee_security_tool_register(IEE_SECURITY_TOOL_LKRG,
+                                      IEE_SECURITY_TOOL_CALLBACK, 0,
+                                      p_lkrg_iee_callback, THIS_MODULE);
+   if (p_ret) {
+      p_print_log(P_LOG_FATAL, "Can't register the IEE security tool slot");
+      goto p_main_error;
+   }
+   p_iee_registered = true;
+   iee_security_tool_invoke(IEE_SECURITY_TOOL_LKRG, 0, NULL);
+
+   p_print_log(P_LOG_ALIVE, "LKRG initialized successfully with IEE dispatch");
 
    p_ret = P_LKRG_SUCCESS;
 
 p_main_error:
 
    if (p_ret != P_LKRG_SUCCESS) {
+      if (p_iee_registered) {
+         iee_security_tool_unregister(IEE_SECURITY_TOOL_LKRG,
+                                      p_lkrg_iee_callback);
+         p_iee_registered = false;
+      }
       p_print_log(P_LOG_DYING, "Not loading LKRG (initialization failed)");
       p_deregister_comm_channel();
       if (p_attr_init)
@@ -714,6 +743,12 @@ static void __exit p_lkrg_deregister(void) {
 
    p_print_log(P_LOG_DYING, "Unloading LKRG");
 
+   if (p_iee_registered) {
+      iee_security_tool_unregister(IEE_SECURITY_TOOL_LKRG,
+                                   p_lkrg_iee_callback);
+      p_iee_registered = false;
+   }
+
    p_uninit_page_attr();
 
    P_CTRL(p_kint_validate) = 0;
@@ -757,7 +792,8 @@ static void __exit p_lkrg_deregister(void) {
    // Thaw all non-kernel processes
    P_SYM_CALL(p_thaw_processes);
 
-   p_print_log(P_LOG_DYING, "LKRG unloaded");
+   p_print_log(P_LOG_DYING, "LKRG unloaded (IEE runs: %lld)",
+               atomic64_read(&p_iee_runs));
 
    lkrg_deregister_net();
 }

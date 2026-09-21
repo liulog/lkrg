@@ -111,6 +111,10 @@ void p_offload_work(struct timer_list *p_timer) {
 
 void p_check_integrity(struct work_struct *p_work) {
 
+   /* Mark every real integrity pass through the protected IEE dispatch. */
+   if (iee_security_tool_invoke(IEE_SECURITY_TOOL_LKRG, 1, p_work))
+      p_print_log(P_LOG_ISSUE, "IEE dispatch unavailable for integrity pass");
+
    /* temporary hash variable */
    uint64_t p_tmp_hash;
    /* per CPU temporary data */
